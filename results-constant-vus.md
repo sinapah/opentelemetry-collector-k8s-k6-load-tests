@@ -30,7 +30,7 @@ CUSTOM
 ```
 
 ## Constant VUs for 20 minutes - 10 VUs
-Summary: all responses returned 200, but 24 of 18,663,293 of all responses were over the 50 ms threshold. The average response took 518 µs. About 11.6K requests were sent per second.
+Summary: all responses returned 200, but 24 of 18,663,293 of all responses were over the 50 ms threshold. The average response took 518 µs. About 15.5K requests were sent per second.
 ```
 CUSTOM
     errors: 0.00%    0 out of 0
