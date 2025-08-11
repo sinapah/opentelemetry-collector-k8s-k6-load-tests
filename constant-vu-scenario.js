@@ -16,9 +16,9 @@ const highLatencyResponses = new Counter('high_latency_responses');
 export const options = {
   scenarios: {
     custom_vu_test: {
-      // The constant-vus executor executor will spin up a certain number of VUs and configures them to execute as many iterations as possible for a duration d.
+      // The constant-vus executor executor will spin up a certain number of VUs and configure them to execute as many iterations as possible for a duration d.
       executor: 'constant-vus',
-      vus: 10,
+      vus: 200,
       duration: '20m',
     },
   },
@@ -30,7 +30,7 @@ export const options = {
 };
 
 // Log message config
-const LOG_SIZE = 1024; // 1KB
+const LOG_SIZE = 1024;
 const LOGS_PER_REQUEST = 1;
 
 export function setup() {

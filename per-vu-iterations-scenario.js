@@ -15,7 +15,7 @@ const highLatencyResponses = new Counter('high_latency_responses');
 // === TEST CONFIG ===
 const VUS = 10;
 const ITERATIONS_PER_VU = 1000000;  // Each VU will run this many iterations in total, however long it takes, unless you specify a max duration
-const MAX_DURATION = '5m';       // Optional safety limit
+const MAX_DURATION = '1m';       // Optional safety limit
 
 export const options = {
   scenarios: {
@@ -35,7 +35,7 @@ export const options = {
 };
 
 // Log config
-const LOG_SIZE = 1024;  // 1KB per log line
+const LOG_SIZE = 1024;
 const LOGS_PER_REQUEST = 1;
 
 export function setup() {

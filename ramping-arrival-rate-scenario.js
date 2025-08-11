@@ -37,13 +37,9 @@ export function setup() {
 }
 
 const LOG_CONFIG = {
-  streams: 4,        // Log streams per client
-  minSize: 1024,     // 1KB
-  maxSize: 2048,     // 2KB
-  thinkTime: {       // Random think time between operations
-    min: 1,
-    max: 3
-  }
+  streams: 4,        
+  minSize: 1024,     
+  maxSize: 2048,     
 };
 
 export default function () {
