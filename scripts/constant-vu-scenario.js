@@ -73,6 +73,7 @@ export default function () {
   let success = false;
 
   try {
+    // This is the HTTP endpoint for sending telemetry. We will hit /v1/logs to send logs. When setting the OTEL_ENDPOINT env var, ensure it includes the port e.g. export OTEL_ENDPOINT=http://OTEL_ADDRESS:4318
     const res = http.post(`${OTEL_ENDPOINT}/v1/logs`, JSON.stringify(payload), {
       headers: { 'Content-Type': 'application/json' },
     });
