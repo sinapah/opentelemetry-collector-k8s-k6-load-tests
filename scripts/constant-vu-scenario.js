@@ -6,6 +6,9 @@ import { Rate, Trend, Counter } from 'k6/metrics';
 const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || 'http://localhost:4318/v1/logs';
 
 // Custom metrics
+// TODO: get the CPU and memory of OTelcol. Can possbile make req to Otel every 10s that queries for these from node exporter
+// TODO: we also need to have the queue (should you collect telemetry from the workload under test from K6 or elsewhere)
+
 const errorRate = new Rate('errors');
 const requestDuration = new Trend('request_duration');
 const throughput = new Rate('throughput');
@@ -23,14 +26,19 @@ export const options = {
     },
   },
   thresholds: {
-    errors: ['rate<0.1'],  // <10% errors - technically not needed, as the current setup is very unlikely to trigger 503 responses
-    request_duration: ['p(95)<50', 'p(99)<100'],  // 95% < 50ms, 99% < 100ms
+    // TODO: check that P(99) is less than 50ms
+    errors: ['rate<0.01'],  // <1% errors - technically not needed, as the current setup is very unlikely to trigger 503 responses
+    request_duration: ['p(99)<50'],  // 95% < 50ms, 99% < 100ms
   },
   discardResponseBodies: true,
 };
 
 // Log message config
+// TODO: use Faker library instead of predefined LOG_SIZE so not all requests are the same size and also makes use of UTF-8
 const LOG_SIZE = 1024;
+
+// TODO: test with scaling up to 10 - what are interested in is not HTTP request count, but rather LOGS sent
+// Get the total logs sent and divide by # of minutes to get /min avg
 const LOGS_PER_REQUEST = 1;
 
 export function setup() {
@@ -74,6 +82,7 @@ export default function () {
 
   try {
     // This is the HTTP endpoint for sending telemetry. We will hit /v1/logs to send logs. When setting the OTEL_ENDPOINT env var, ensure it includes the port e.g. export OTEL_ENDPOINT=http://OTEL_ADDRESS:4318
+    // TODO: compare performance between JSON and when using Proto (when sending payload serialized using Protos)
     const res = http.post(`${OTEL_ENDPOINT}/v1/logs`, JSON.stringify(payload), {
       headers: { 'Content-Type': 'application/json' },
     });
