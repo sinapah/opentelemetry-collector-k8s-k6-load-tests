@@ -13,9 +13,9 @@ const non200Responses = new Counter('non_200_responses');
 const highLatencyResponses = new Counter('high_latency_responses');
 
 // === TEST CONFIG ===
-const VUS = 10;
-const ITERATIONS_PER_VU = 20000000;  // Each VU will run this many iterations in total, however long it takes, unless you specify a max duration
-const MAX_DURATION = '1m';       // Optional safety limit
+const VUS = 200;
+const ITERATIONS_PER_VU = 110000;  // Each VU will run this many iterations in total, however long it takes, unless you specify a max duration
+const MAX_DURATION = '2h';       // Optional safety limit
 
 export const options = {
   scenarios: {
