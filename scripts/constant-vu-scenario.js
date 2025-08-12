@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { Rate, Trend, Counter } from 'k6/metrics';
 
-// OTLP endpoint (default to localhost if not provided)
+// HTTP endpoint at 4318 (default to localhost if not provided)
 const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || 'http://localhost:4318/v1/logs';
 
 // Custom metrics
@@ -19,7 +19,7 @@ export const options = {
       // The constant-vus executor executor will spin up a certain number of VUs and configure them to execute as many iterations as possible for a duration d.
       executor: 'constant-vus',
       vus: 200,
-      duration: '20m',
+      duration: '1h',
     },
   },
   thresholds: {

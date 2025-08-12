@@ -13,9 +13,9 @@ const non200Responses = new Counter('non_200_responses');
 const highLatencyResponses = new Counter('high_latency_responses');
 
 // === CONFIG ===
-const TOTAL_ITERATIONS = 2000000; 
-const VUS = 10;
-const MAX_DURATION = '5m';       // max to prevent test from goign on forever
+const TOTAL_ITERATIONS = 10000000; 
+const VUS = 200;
+const MAX_DURATION = '1h';       // max to prevent test from goign on forever
 
 export const options = {
   scenarios: {
