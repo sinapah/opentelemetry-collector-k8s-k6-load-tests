@@ -1,6 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 import { Rate, Trend, Counter } from 'k6/metrics';
+import faker from "k6/x/faker"
 
 // HTTP endpoint at 4318 (default to localhost if not provided)
 const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || 'http://localhost:4318/v1/logs';
@@ -41,6 +42,17 @@ const LOG_SIZE = 1024;
 // Get the total logs sent and divide by # of minutes to get /min avg
 const LOGS_PER_REQUEST = 1;
 
+function generateLogBody(minSize = 256, maxSize = 2048) {
+  const targetLength = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+  let text = '';
+
+  while (text.length < targetLength) {
+    text += faker.language.language() + ' ';
+  }
+
+  return text.slice(0, targetLength);
+}
+
 export function setup() {
   console.log(`Starting load test with 10 constant VUs`);
   console.log(`Target OTEL endpoint: ${OTEL_ENDPOINT}`);
@@ -54,7 +66,7 @@ export default function () {
   const logRecords = Array.from({ length: LOGS_PER_REQUEST }, (_, i) => ({
     timeUnixNano: `${timestamp}`,
     severityText: "INFO",
-    body: { stringValue: `VU ${__VU} - Log ${i + 1}: ${'x'.repeat(LOG_SIZE)}` },
+    body: { stringValue: generateLogBody() },
     attributes: [
       { key: "vu", value: { stringValue: `vu-${__VU}` } },
       { key: "stream_id", value: { stringValue: `stream-${i + 1}` } }
