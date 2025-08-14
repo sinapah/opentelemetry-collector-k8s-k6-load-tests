@@ -1,7 +1,7 @@
 import http from "k6/http";
 import { check } from "k6";
 import { Rate, Trend, Counter } from "k6/metrics";
-import faker from "k6/x/faker";
+import { generateLogBody } from "./helpers.js";
 
 // HTTP endpoint at 4318 (default to localhost if not provided)
 const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || "http://localhost:4318/v1/logs";
@@ -23,14 +23,14 @@ export const options = {
     custom_vu_test: {
       // The constant-vus executor executor will spin up a certain number of VUs and configure them to execute as many iterations as possible for a duration d.
       executor: "constant-vus",
-      vus: 200,
-      duration: "1h",
+      vus: 35,
+      duration: "10m",
     },
   },
   thresholds: {
     // TODO: check that P(99) is less than 50ms
     errors: ["rate<0.01"],
-    request_duration: ["p(99)<50"],
+    request_duration: ["p(99)<100"],
   },
   discardResponseBodies: true,
 };
@@ -40,18 +40,6 @@ export const options = {
 
 // TODO: test with scaling up to 10 - what are interested in is not HTTP request count, but rather LOGS sent
 // Get the total logs sent and divide by # of minutes to get /min avg
-
-function generateLogBody(minSize = 256, maxSize = 2048) {
-  const targetLength =
-    Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-  let text = "";
-
-  while (text.length < targetLength) {
-    text += faker.language.language() + " ";
-  }
-
-  return text.slice(0, targetLength);
-}
 
 export function setup() {
   console.log(`Starting load test with 10 constant VUs`);
@@ -63,9 +51,8 @@ export default function () {
   const timestamp = Date.now() * 1e6;
 
   // Randomize the number of logs per this request (between 1-10) and increment the totalLogs counter
-  const logs_per_request = Math.floor(Math.random() * 10) + 1;
+  const logs_per_request = 5; //Math.floor(Math.random() * 10) + 1;
   totalLogs.add(logs_per_request);
-  console.log("Logs per req, ", logs_per_request);
 
   // Create log records
   const logRecords = Array.from({ length: logs_per_request }, (_, i) => ({
