@@ -1,6 +1,5 @@
 import http from "k6/http";
 import { check } from "k6";
-import { Rate, Trend, Counter } from "k6/metrics";
 import {
   errorRate,
   requestDuration,
@@ -11,50 +10,52 @@ import {
   total503errors,
   generateLogBody,
 } from "./helpers.js";
-// OTLP endpoint
-const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || "http://localhost:4318";
+// HTTP endpoint at 4318 (default to localhost if not provided)
+const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || "http://localhost:4318/v1/logs";
 
-// === TEST CONFIG ===
+// Custom metrics
+// TODO: get the CPU and memory of OTelcol. Can possbile make req to Otel every 10s that queries for these from node exporter
+// TODO: we also need to have the queue (question: should we collect telemetry from the workload under test from K6 or elsewhere?)
 
-const DURATION_SEC = 120; // 2 minutes
-
-const VUS = 10;
-
+// Test config
 export const options = {
   scenarios: {
-    constant_rate_test: {
-      // The constant-arrival-rate executor will keep the iterations constant and vary the number of VUs to ensure it meets the number of iterations to execute within time d.
-      executor: "constant-arrival-rate",
-      rate: 900, // iterations per second
-      timeUnit: "1s", // each rate is per second
-      duration: `${DURATION_SEC}s`, // total test time - this derive
-      preAllocatedVUs: VUS,
+    custom_vu_test: {
+      // The constant-vus executor executor will spin up a certain number of VUs and configure them to execute as many iterations as possible for a duration d.
+      executor: "constant-vus",
+      vus: 3,
+      duration: "10m",
     },
   },
   thresholds: {
-    errors: ["rate<0.1"],
-    request_duration: ["p(95)<50", "p(99)<100"],
+    // TODO: check that P(99) is less than 50ms
+    errors: ["rate<0.01"],
+    request_duration: ["p(99)<100"],
   },
   discardResponseBodies: true,
 };
 
-// Log config
-const LOG_CONFIG = {
-  minSize: 1024,
-  maxSize: 2048,
-};
+// Log message config
+// TODO: use Faker library instead of predefined LOG_SIZE so not all requests are the same size and also makes use of UTF-8
+
+// TODO: test with scaling up to 10 - what are interested in is not HTTP request count, but rather LOGS sent
+// Get the total logs sent and divide by # of minutes to get /min avg
 
 export function setup() {
-  console.log(`Target endpoint: ${OTEL_ENDPOINT}`);
-  return { startTime: new Date().toISOString() };
+  console.log(`Starting load test with 10 constant VUs`);
+  console.log(`Target OTEL endpoint: ${OTEL_ENDPOINT}`);
 }
 
+// Main function executed by each VU
 export default function () {
-  const logsPerRequest = 12;
-
   const timestamp = Date.now() * 1e6;
 
-  const logRecords = Array.from({ length: logsPerRequest }, (_, i) => ({
+  // Randomize the number of logs per this request (between 1-10) and increment the totalLogs counter
+  const logs_per_request = 5; //Math.floor(Math.random() * 10) + 1;
+  totalLogs.add(logs_per_request);
+
+  // Create log records
+  const logRecords = Array.from({ length: logs_per_request }, (_, i) => ({
     timeUnixNano: `${timestamp}`,
     severityText: "INFO",
     body: { stringValue: generateLogBody() },
@@ -64,9 +65,7 @@ export default function () {
     ],
   }));
 
-  const start = Date.now();
-  let success = false;
-
+  // OTLP payload
   const payload = {
     resourceLogs: [
       {
@@ -85,6 +84,9 @@ export default function () {
       },
     ],
   };
+
+  const start = Date.now();
+  let success = false;
 
   try {
     // This is the HTTP endpoint for sending telemetry. We will hit /v1/logs to send logs. When setting the OTEL_ENDPOINT env var, ensure it includes the port e.g. export OTEL_ENDPOINT=http://OTEL_ADDRESS:4318
