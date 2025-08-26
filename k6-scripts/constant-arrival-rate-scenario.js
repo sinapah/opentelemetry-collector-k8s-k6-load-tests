@@ -14,15 +14,15 @@ import {
 const OTEL_ENDPOINT = __ENV.OTEL_ENDPOINT || "http://localhost:4318";
 
 // === TEST CONFIG ===
-
+//vus: 6;
 export const options = {
   scenarios: {
     constant_rate_test: {
       // The constant-arrival-rate executor will keep the iterations constant and vary the number of VUs to ensure it meets the number of iterations to execute within time d.
       executor: "constant-arrival-rate",
-      rate: 100000, // iterations per minute (5 logs per iteration)
+      rate: 2000, // iterations per minute (5 logs per iteration)
       timeUnit: "1m",
-      duration: "10m",
+      duration: "1m",
       preAllocatedVUs: 200,
       maxVUs: 300,
     },
@@ -63,6 +63,7 @@ export default function () {
           attributes: [
             { key: "service.name", value: { stringValue: "k6-load-test" } },
             { key: "host.name", value: { stringValue: "k6" } },
+            { model: "otel" },
           ],
         },
         scopeLogs: [
@@ -96,8 +97,8 @@ export default function () {
 
     if (!success) {
       errorRate.add(1);
-      //console.error(`Failed: ${res.status} - ${JSON.stringify(res)}`);
-      console.error(`Failed: ${res.status}`);
+      console.error(`Failed: ${res.status} - ${JSON.stringify(res)}`);
+      //console.error(`Failed: ${res.status}`);
     }
 
     if (res.status !== 200 && res.status !== 204) {

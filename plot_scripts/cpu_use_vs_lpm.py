@@ -13,22 +13,19 @@ def plot_dataframe(ax, df, queue_label, color, marker_style='o'):
     error_rate = df['Failed HTTP Request Error %'].values
     p99 = df['P(99) (ms)'].values
     cpu_use = df['Otel Under Test Average CPU Use (m-cores)'].values
-    passed_marker = {'marker': 'o', 'color': 'gray', 'linestyle': 'None'}
-
-    plotted_passed = False
-    plotted_failed = False
+    max_cpu_use = df['Otel Under Test Max CPU Use (m-cores)'].values
 
     for i in range(len(df)):
         x = log_lines[i]
         y = cpu_use[i]
         latency = p99[i]
         error = error_rate[i]
-
+        max_val = max_cpu_use[i]
         point_color = color
 
         ax.plot(x, y, marker_style, color=point_color, markersize=5)
 
-        label = ""
+        label = f"max: {max_val:.0f}"
         offset_x = 2500
         offset_y = 3
         ax.text(x + offset_x, y + offset_y, label, fontsize=8, color=color, alpha=0.8)
