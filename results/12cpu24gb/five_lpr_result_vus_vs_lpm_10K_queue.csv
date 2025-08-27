@@ -1,0 +1,8 @@
+Log Lines / Minute,Average # of VUs,Max # of VUs,Average Queue Size,Max Queue Size,Number of High Latency Responses,P(99) (ms),Failed HTTP Request Error %,Otel Under Test Average CPU Use (m-cores),Otel Under Test Max CPU Use (m-cores),Otel Under Test Average Memory Use (MiB),Otel Under Test Max Memory Use (MiB),Otel as Loki Average CPU Use (m-cores),Otel as Loki Max CPU Use (m-cores),Otel as Loki Average Memory Use (MiB),Otel as Loki Test Max Memory Use (MiB)
+1000,1,1,0,0,0,4,0,26,39,210,212,15,18,178,179
+10000,1,1,0.22,1,0,4,0,237,274,214,215,77,98,178,180
+100000,1.05,3,0.17,2,0,5,0,302,380,217,220,103,128,180,183
+300000,2.81,60,0.52,3,27,4,0,862,1075,219,222,262,319,180,181
+360000,3.54,40,1.07,11,15,5,0,1102,1400,221,229,338,421,182,195
+400000,37,300,3131,10000,95921,156,13,1470,2003,128,153,339,498,168,170
+500000,222.37,300,9623,10000,296730,100,53,1916,2004,146,161,294,494,167,170													
