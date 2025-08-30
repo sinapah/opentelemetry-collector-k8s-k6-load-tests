@@ -25,8 +25,7 @@ export function generateLogBody(minSize = 256, maxSize = 2048) {
   let text = "";
 
   while (text.length < targetLength) {
-    //text += faker.word.loremIpsumSentence() + " ";
-    text += faker.word.verb() + " ";
+    text += faker.word.loremIpsumSentence() + " ";
   }
   console.log(text);
   return text.slice(0, targetLength);
