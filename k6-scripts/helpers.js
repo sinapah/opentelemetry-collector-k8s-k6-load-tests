@@ -1,4 +1,4 @@
-import faker from "k6/x/faker";
+import { Faker } from "k6/x/faker";
 import { Rate, Trend, Counter } from "k6/metrics";
 
 const errorRate = new Rate("errors");
@@ -18,15 +18,16 @@ export {
   totalLogs,
   total503errors,
 };
-
+const faker = new Faker("de");
 export function generateLogBody(minSize = 256, maxSize = 2048) {
   const targetLength =
     Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
   let text = "";
 
   while (text.length < targetLength) {
-    text += faker.language.language() + " ";
+    //text += faker.word.loremIpsumSentence() + " ";
+    text += faker.word.verb() + " ";
   }
-
+  console.log(text);
   return text.slice(0, targetLength);
 }
